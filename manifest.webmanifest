@@ -1,7 +1,7 @@
 {
   "name": "PR早見帳 — Premiere Pro ショートカット & 便利ワザ",
   "short_name": "PR早見帳",
-  "description": "齋藤さん専用キーで引ける Premiere Pro のショートカット早見帳＋便利ワザ集",
+  "description": "動画編集CAMPベースのカスタムキーで引ける Premiere Pro のショートカット早見帳＋便利ワザ集",
   "lang": "ja",
   "start_url": "./index.html",
   "scope": "./",
