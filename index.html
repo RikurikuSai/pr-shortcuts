@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14141c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PR早見帳">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<title>PR早見帳 — Premiere Pro ショートカット & 便利ワザ</title>
+<style>
+  :root {
+    --bg: #14141c;
+    --bg2: #1c1c28;
+    --card: #232333;
+    --card2: #2b2b40;
+    --line: #34344c;
+    --text: #eceaf6;
+    --sub: #9d9ab5;
+    --accent: #b3a4ff;      /* AEっぽい紫 */
+    --accent2: #64d8cb;
+    --kbd-bg: #32324a;
+    --kbd-line: #4a4a68;
+    --radius: 14px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    padding-bottom: calc(24px + var(--safe-bottom));
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 0 14px; }
+
+  /* ===== ヘッダー ===== */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: linear-gradient(180deg, rgba(20,20,28,.98), rgba(20,20,28,.92));
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    padding-top: var(--safe-top);
+  }
+  .head-top {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px 4px;
+    max-width: 560px; margin: 0 auto;
+  }
+  .logo {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: #33206b;
+    color: var(--accent);
+    font-weight: 800; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid #6a4bd6;
+    flex: none;
+  }
+  h1 { font-size: 17px; margin: 0; font-weight: 700; letter-spacing: .02em; }
+  h1 small { display: block; font-size: 10.5px; color: var(--sub); font-weight: 500; }
+
+  .os-toggle {
+    margin-left: auto; flex: none;
+    display: flex; background: var(--card); border: 1px solid var(--line);
+    border-radius: 99px; padding: 3px; gap: 2px;
+  }
+  .os-toggle button {
+    border: 0; background: transparent; color: var(--sub);
+    font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 99px;
+    cursor: pointer;
+  }
+  .os-toggle button.on { background: var(--accent); color: #17142e; }
+
+  .searchbar { padding: 8px 14px 10px; max-width: 560px; margin: 0 auto; }
+  .searchbar input {
+    width: 100%; padding: 10px 14px;
+    border-radius: 12px; border: 1px solid var(--line);
+    background: var(--card); color: var(--text);
+    font-size: 15px; outline: none;
+  }
+  .searchbar input:focus { border-color: var(--accent); }
+  .searchbar input::placeholder { color: #6f6c8a; }
+
+  /* ===== タブ ===== */
+  .tabs {
+    display: flex; max-width: 560px; margin: 0 auto; padding: 0 14px;
+  }
+  .tabs button {
+    flex: 1 1 auto; background: none; border: 0; color: var(--sub);
+    font-size: 12.5px; font-weight: 700; padding: 10px 2px 12px;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent; cursor: pointer;
+  }
+  .tabs button.on { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* ===== カテゴリチップ ===== */
+  .chips {
+    display: flex; gap: 8px; overflow-x: auto; padding: 14px 14px 4px;
+    max-width: 560px; margin: 0 auto;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips button {
+    flex: none; border: 1px solid var(--line); background: var(--card);
+    color: var(--sub); font-size: 12.5px; font-weight: 600;
+    padding: 6px 13px; border-radius: 99px; cursor: pointer;
+  }
+  .chips button.on { background: var(--accent); border-color: var(--accent); color: #17142e; }
+
+  /* ===== 並び順切替 ===== */
+  .sortbar {
+    display: flex; align-items: center; gap: 6px;
+    max-width: 560px; margin: 0 auto; padding: 10px 14px 0;
+  }
+  .sort-label { font-size: 11px; color: var(--sub); font-weight: 700; margin-right: 2px; }
+  .sortbar button {
+    border: 1px solid var(--line); background: var(--card);
+    color: var(--sub); font-size: 12px; font-weight: 700;
+    padding: 5px 12px; border-radius: 99px; cursor: pointer;
+  }
+  .sortbar button.on { background: var(--card2); border-color: var(--accent); color: var(--text); }
+
+  /* ===== リスト・カード ===== */
+  .list { padding-top: 4px; }
+  .cat-head {
+    font-size: 13.5px; font-weight: 800; color: var(--text);
+    margin: 22px 2px 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--line);
+  }
+  .cat-head .count { color: var(--sub); font-weight: 700; font-size: 11px; margin-left: 4px; }
+  .cat-head.tier { color: var(--accent); border-bottom-color: transparent; font-size: 12px; letter-spacing: .1em; padding-bottom: 0; }
+  .hot-stars { color: #f2a65a; font-size: 10px; letter-spacing: .1em; vertical-align: 2px; margin-left: 2px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px;
+  }
+  .sc-row { display: flex; align-items: center; gap: 10px; }
+  .sc-name { font-weight: 700; font-size: 14.5px; }
+  .sc-desc { color: var(--sub); font-size: 12.5px; margin-top: 2px; }
+  .sc-keys { margin-left: auto; flex: none; display: flex; gap: 3px; align-items: center; }
+  kbd {
+    display: inline-block; min-width: 22px; text-align: center;
+    background: var(--kbd-bg); border: 1px solid var(--kbd-line);
+    border-bottom-width: 2.5px;
+    border-radius: 6px; padding: 3px 7px;
+    font: 700 12px/1.3 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color: #cfc9ff;
+  }
+  .plus { color: #5f5c7d; font-size: 11px; font-weight: 700; }
+
+  .empty { text-align: center; color: var(--sub); padding: 50px 0; font-size: 14px; }
+
+  /* ===== エクスプレッションカード ===== */
+  .ex-card { padding: 0; overflow: hidden; }
+  .ex-head { padding: 13px 14px; cursor: pointer; }
+  .ex-title { display: flex; align-items: center; gap: 8px; }
+  .ex-title .ex-name { font-weight: 800; font-size: 15.5px; }
+  .ex-badge {
+    font-size: 10px; font-weight: 800; color: var(--accent2);
+    border: 1px solid rgba(100,216,203,.4); border-radius: 6px;
+    padding: 1px 7px; letter-spacing: .05em;
+  }
+  .ex-tag { color: var(--sub); font-size: 12.5px; margin-top: 3px; }
+  .ex-caret { margin-left: auto; color: #5f5c7d; transition: transform .2s; font-size: 12px; }
+  .ex-card.open .ex-caret { transform: rotate(90deg); }
+
+  .ex-body { display: none; border-top: 1px solid var(--line); padding: 13px 14px 15px; }
+  .ex-card.open .ex-body { display: block; }
+
+  .ex-code {
+    position: relative;
+    background: #101018; border: 1px solid var(--line); border-radius: 10px;
+    padding: 11px 13px; margin: 2px 0 12px;
+    font: 600 13px/1.55 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color: #b7e6a5; overflow-x: auto; white-space: pre;
+  }
+  .copy-btn {
+    position: absolute; top: 7px; right: 7px;
+    background: var(--card2); color: var(--sub);
+    border: 1px solid var(--line); border-radius: 8px;
+    font-size: 11px; font-weight: 700; padding: 4px 10px; cursor: pointer;
+  }
+  .copy-btn.done { color: var(--accent2); border-color: var(--accent2); }
+
+  .ex-kid {
+    background: rgba(154,140,255,.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 10px 12px; font-size: 13.5px; margin-bottom: 12px;
+  }
+  .ex-kid b { color: var(--accent); }
+
+  .ex-ai {
+    background: rgba(255, 145, 200, .07);
+    border-left: 3px solid #ff91c8;
+    border-radius: 0 10px 10px 0;
+    padding: 10px 12px; font-size: 12.5px; margin-bottom: 12px;
+  }
+  .ex-ai .ai-t { font-weight: 800; color: #ff9ecf; font-size: 12px; margin-bottom: 4px; }
+  .ex-ai .ai-text { color: var(--sub); line-height: 1.75; }
+  .ex-ai .ai-copy {
+    display: block; width: 100%; margin-top: 8px;
+    background: rgba(255,145,200,.12); border: 1px solid rgba(255,145,200,.4);
+    color: #ffb9dc; font-size: 12px; font-weight: 700;
+    border-radius: 8px; padding: 7px 0; cursor: pointer;
+  }
+  .ex-ai .ai-copy.done { color: var(--accent2); border-color: var(--accent2); }
+
+  .ex-combo {
+    background: rgba(100,216,203,.07);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 10px 10px 0;
+    padding: 10px 12px; font-size: 13px; margin-bottom: 12px;
+  }
+  .ex-combo .combo-t { font-weight: 800; color: var(--accent2); font-size: 12px; margin-bottom: 4px; }
+  .ex-combo ul { margin: 0; padding-left: 18px; }
+  .ex-combo li { margin: 4px 0; }
+  .ex-combo code, .ex-kid code {
+    background: #101018; border: 1px solid var(--line); border-radius: 5px;
+    padding: 1px 5px; font-size: 12px; color: #b7e6a5;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  .gem-badge {
+    display: inline-block; font-size: 10px; font-weight: 800;
+    color: #ffd166; border: 1px solid rgba(255,209,102,.45);
+    border-radius: 6px; padding: 0 6px; vertical-align: 2px;
+    letter-spacing: .02em;
+  }
+  .mini-cat {
+    display: inline-block; font-size: 10px; color: var(--sub);
+    border: 1px solid var(--line); border-radius: 5px;
+    padding: 0 5px; font-weight: 600; vertical-align: 2px; margin-left: 2px;
+  }
+
+  /* ===== お気に入り・カードリンク ===== */
+  .fav-btn {
+    background: none; border: 0; font-size: 19px; color: #4a4a68;
+    cursor: pointer; padding: 2px 4px; flex: none; line-height: 1;
+  }
+  .fav-btn.on { color: #ffd166; }
+  .link-btn {
+    position: absolute; top: 7px; right: 66px;
+    background: var(--card2); color: var(--sub);
+    border: 1px solid var(--line); border-radius: 8px;
+    font-size: 11px; font-weight: 700; padding: 4px 8px; cursor: pointer;
+  }
+  .link-btn.done { color: var(--accent2); border-color: var(--accent2); }
+
+  /* ===== クイズ ===== */
+  .quiz-hero { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+  .quiz-lead { color: var(--sub); font-size: 13px; margin: 0 0 6px; }
+  .quiz-prog { font-size: 11px; color: var(--sub); font-weight: 700; letter-spacing: .08em; margin-bottom: 6px; }
+  .quiz-q { font-size: 16px; font-weight: 800; margin: 4px 0 2px; }
+  .quiz-hint { color: var(--sub); font-size: 12px; margin-bottom: 8px; }
+  .quiz-choice {
+    display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;
+    margin-top: 10px; padding: 13px 10px; border-radius: 12px;
+    background: var(--bg2); border: 1px solid var(--line);
+    font-size: 14px; font-weight: 700; cursor: pointer; text-align: center;
+  }
+  .quiz-choice.ok { border-color: #4ade80; background: rgba(74,222,128,.12); }
+  .quiz-choice.ng { border-color: #f87171; background: rgba(248,113,113,.12); opacity: .85; }
+  .quiz-mode-btn, .quiz-next {
+    display: block; width: 100%; margin-top: 10px; padding: 12px 0; border-radius: 12px;
+    background: var(--card2); border: 1px solid var(--kbd-line); color: var(--text);
+    font-size: 14px; font-weight: 800; cursor: pointer;
+  }
+  .quiz-next { background: var(--accent); border-color: var(--accent); color: #17142e; }
+  .quiz-result { text-align: center; padding: 10px 14px 16px; }
+  .quiz-score { font-size: 44px; font-weight: 800; color: var(--accent); margin: 6px 0 0; }
+  .quiz-msg { font-weight: 700; margin: 6px 0 14px; }
+
+  .demo-wrap { margin-top: 4px; }
+  .demo-stage {
+    position: relative; height: 120px;
+    background:
+      linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px),
+      #101018;
+    background-size: 20px 20px, 20px 20px, auto;
+    border: 1px solid var(--line); border-radius: 10px;
+    overflow: hidden;
+  }
+  .demo-ball {
+    position: absolute; width: 26px; height: 26px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 30%, #c9beff, var(--accent) 60%, #6f5fe0);
+    box-shadow: 0 3px 12px rgba(154,140,255,.45);
+    top: 0; left: 0;
+    will-change: transform;
+  }
+  .demo-ball.b2 { background: radial-gradient(circle at 32% 30%, #b8f4ec, var(--accent2) 60%, #35a99c); box-shadow: 0 3px 12px rgba(100,216,203,.4); }
+  .demo-ball.b3 { background: radial-gradient(circle at 32% 30%, #ffd9a8, #f2a65a 60%, #cf7f34); box-shadow: 0 3px 12px rgba(242,166,90,.4); }
+  .demo-ball.square { border-radius: 7px; }
+  .demo-ghost { opacity: .35; }
+  .demo-label {
+    position: absolute; bottom: 6px; left: 10px;
+    font-size: 10.5px; color: #6f6c8a; font-weight: 600; pointer-events: none;
+  }
+  .demo-btn {
+    margin-top: 9px; width: 100%;
+    background: var(--card2); border: 1px solid var(--kbd-line);
+    color: var(--text); font-size: 13px; font-weight: 800;
+    border-radius: 10px; padding: 9px 0; cursor: pointer;
+  }
+  .demo-btn.playing { background: var(--accent); border-color: var(--accent); color: #17142e; }
+
+  footer { text-align: center; color: #5f5c7d; font-size: 11.5px; margin-top: 34px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-top">
+    <div class="logo">Pr</div>
+    <h1>PR早見帳<small>Premiere Pro ショートカット & 便利ワザ（齋藤さん専用キー）</small></h1>
+  </div>
+  <div class="searchbar">
+    <input id="search" type="search" placeholder="キーワードで検索（例: カット, インサート, 書き出し, F）" autocomplete="off">
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="shortcuts" class="on">⌨️ ショートカット</button>
+    <button data-tab="tips">💡 便利ワザ</button>
+    <button data-tab="quiz">🎯 クイズ</button>
+  </nav>
+</header>
+
+<div class="chips" id="chips"></div>
+
+<div class="sortbar" id="sortbar">
+  <span class="sort-label">並び順</span>
+  <button data-sort="cat" class="on">カテゴリごと</button>
+  <button data-sort="hot">よく使う順</button>
+</div>
+
+<main class="wrap">
+  <div class="list" id="list"></div>
+  <footer></footer>
+</main>
+<script>
+const SHORTCUTS = [{"cat": "CAMP標準", "name": "選択ツール", "mac": "V", "desc": "いちばん基本の矢印。迷ったらVに戻る", "hot": 3}, {"cat": "CAMP標準", "name": "再生 / 停止", "mac": "Space", "desc": "スペースで再生・停止。基本中の基本", "hot": 3}, {"cat": "CAMP標準", "name": "カット（編集点を追加）", "mac": "S", "desc": "再生ヘッドの位置でクリップをパチンと切る。カット編集の起点", "hot": 3, "gem": true}, {"cat": "CAMP標準", "name": "前の編集点を再生ヘッドまでリップルトリミング", "mac": "A", "desc": "ヘッドより前の不要部分を一発で削除して自動で詰める", "hot": 3, "gem": true}, {"cat": "CAMP標準", "name": "次の編集点を再生ヘッドまでリップルトリミング", "mac": "D", "desc": "ヘッドより後ろの不要部分を一発で削除して自動で詰める", "hot": 3, "gem": true}, {"cat": "CAMP標準", "name": "リップル削除", "mac": "F", "desc": "クリップを消してすき間も自動で詰める。カット編集の主役", "hot": 3, "gem": true}, {"cat": "CAMP標準", "name": "消去", "mac": "⌫", "desc": "選んだクリップを消す（すき間は残る）。※講座動画ではQでしたが、現在Qはリップルアウト選択に変更", "hot": 2}, {"cat": "CAMP標準", "name": "ネスト", "mac": "N", "desc": "複数クリップを1つの箱にまとめる。※講座動画ではWでしたが、現在はN（Wはリップルイン選択に変更）", "hot": 2, "gem": true}, {"cat": "CAMP標準", "name": "トラックの前方選択ツール", "mac": "X", "desc": "そこから右のクリップを全部まとめて選択。※動画のZ=後方選択は現在未割当（Zはロール選択に変更）", "hot": 2, "gem": true}, {"cat": "CAMP標準", "name": "右へシャトル（倍速再生）", "mac": "C", "desc": "押すたびに再生が速くなる。仕上がりの倍速チェックに", "hot": 2}, {"cat": "CAMP標準", "name": "ズームイン（タイムライン拡大）", "mac": "[", "desc": "時間軸を拡大して細かく編集。※講座動画ではEでしたが、現在は[（Eは編集点延長に変更）", "hot": 2}, {"cat": "CAMP標準", "name": "ズームアウト（タイムライン縮小）", "mac": "]", "desc": "時間軸を縮小して全体を見る。※講座動画ではRでしたが、現在は]（Rはレート調整に変更）", "hot": 2}, {"cat": "CAMP標準", "name": "横書き文字ツール", "mac": "T", "desc": "テロップ・字幕を打つ", "hot": 2}, {"cat": "CAMP標準", "name": "オーディオゲイン", "mac": "G", "desc": "クリップ単位で音量を数値調整（ノーマライズ）", "hot": 2}, {"cat": "CAMP標準", "name": "マーカーを打つ", "mac": "M", "desc": "いまの位置に目印。あとで見返す・指示出しに", "hot": 2}, {"cat": "CAMP標準", "name": "ラベル: バイオレット", "mac": "2", "desc": "クリップに紫ラベルを付けて色分け整理", "hot": 2}, {"cat": "CAMP標準", "name": "ラベル: アイリス", "mac": "3", "desc": "クリップに青系（アイリス）ラベルを付けて色分け整理", "hot": 2}, {"cat": "CAMP標準", "name": "インへ移動", "mac": "⇧I", "desc": "イン点（冒頭）へジャンプして最初から再生確認。※講座動画では⇧Z案、現在は⇧I", "hot": 1}, {"cat": "基本操作", "name": "取り消し（アンドゥ）", "mac": "⌘Z", "desc": "「やっちゃった！」を1つ前に戻す。困ったらまずこれ", "hot": 3}, {"cat": "基本操作", "name": "やり直し（リドゥ）", "mac": "⇧⌘Z", "desc": "戻しすぎたときに、もう一度進める"}, {"cat": "基本操作", "name": "保存", "mac": "⌘S", "desc": "こまめに保存！Premiereが落ちても泣かないために", "hot": 3}, {"cat": "基本操作", "name": "別名で保存", "mac": "⇧⌘S", "desc": "別ファイルとして保存。納品版と作業版の分けに", "hot": 1}, {"cat": "基本操作", "name": "コピーを保存", "mac": "⌥⌘S", "desc": "いまの状態を別名で複製保存。バックアップに", "hot": 1}, {"cat": "基本操作", "name": "コピー", "mac": "⌘C", "desc": "選んだクリップやキーフレームをコピー", "hot": 3}, {"cat": "基本操作", "name": "カット（切り取り）", "mac": "⌘X", "desc": "コピーして元を消す"}, {"cat": "基本操作", "name": "ペースト", "mac": "⌘V", "desc": "コピーしたものを貼り付け", "hot": 3}, {"cat": "基本操作", "name": "インサートでペースト", "mac": "⌃V", "desc": "再生ヘッド位置に割り込ませて貼り付け（後ろがずれる）", "hot": 1, "gem": true}, {"cat": "基本操作", "name": "属性をペースト", "mac": "⇧V", "desc": "エフェクトや位置設定だけを他クリップにコピー", "hot": 2, "gem": true}, {"cat": "基本操作", "name": "すべて選択", "mac": "⌘A", "desc": "全部選ぶ"}, {"cat": "基本操作", "name": "選択をすべて解除", "mac": "⇧⌘A", "desc": "選択をやめる。誤操作リセットに"}, {"cat": "基本操作", "name": "検索", "mac": "⌃F", "desc": "パネル内を検索"}, {"cat": "基本操作", "name": "環境設定を開く", "mac": "⌘,", "desc": "Premiere全体の設定画面", "hot": 1}, {"cat": "基本操作", "name": "キーボードショートカット設定", "mac": "⌥⌘K", "desc": "この早見帳の元。自分好みにキーを変える", "hot": 1}, {"cat": "ファイル・プロジェクト", "name": "新規プロジェクト", "mac": "⌥⌘N", "desc": "新しい編集プロジェクトを作る"}, {"cat": "ファイル・プロジェクト", "name": "新規シーケンス", "mac": "⌘N", "desc": "動画を並べる「タイムライン」を新しく作る", "hot": 2}, {"cat": "ファイル・プロジェクト", "name": "プロジェクトを開く", "mac": "⌘O", "desc": "保存済みプロジェクトを開く"}, {"cat": "ファイル・プロジェクト", "name": "読み込み（インポート）", "mac": "⌘I", "desc": "動画・画像・音の素材を取り込む", "hot": 3}, {"cat": "ファイル・プロジェクト", "name": "新規ビン", "mac": "B", "desc": "素材を整理するフォルダを作る"}, {"cat": "ファイル・プロジェクト", "name": "選択物から新規ビン", "mac": "⇧B", "desc": "選んだ素材をまとめてフォルダに", "hot": 1}, {"cat": "ファイル・プロジェクト", "name": "調整レイヤー", "mac": "⌘T", "desc": "下のクリップ全部にまとめて効果をかける透明な板", "hot": 2, "gem": true}, {"cat": "ファイル・プロジェクト", "name": "閉じる", "mac": "⌘W", "desc": "いまのプロジェクト/パネルを閉じる"}, {"cat": "ファイル・プロジェクト", "name": "プロジェクトマネージャー", "mac": "⌘P", "desc": "使った素材だけ集めて整理・書き出し", "hot": 1}, {"cat": "ファイル・プロジェクト", "name": "メディアをリンク", "mac": "⌥M", "desc": "リンク切れ(オフライン)素材を貼り直す", "hot": 1, "gem": true}, {"cat": "ツール", "name": "レート調整ツール", "mac": "R", "desc": "クリップの端を伸縮して速度を変える", "hot": 1}, {"cat": "ツール", "name": "ペンツール", "mac": "⇧Y", "desc": "キーフレームやマスクの点を打つ", "hot": 1}, {"cat": "ツール", "name": "長方形ツール", "mac": "⇧G", "desc": "四角い図形・帯を描く", "hot": 1}, {"cat": "ツール", "name": "楕円ツール", "mac": "⇧R", "desc": "丸い図形を描く", "hot": 1}, {"cat": "ツール", "name": "リミックスツール", "mac": "⌃R", "desc": "BGMを尺に合わせて自動で伸縮", "hot": 1, "gem": true}, {"cat": "再生・ナビ", "name": "早戻し再生", "mac": "⌃Space", "desc": "押すごとに逆再生スピードが上がる（後方向）", "hot": 2}, {"cat": "再生・ナビ", "name": "スロー再生（前）", "mac": "⇧L", "desc": "ゆっくり前に再生"}, {"cat": "再生・ナビ", "name": "スロー再生（後）", "mac": "⇧J", "desc": "ゆっくり後ろに再生"}, {"cat": "再生・ナビ", "name": "1コマ進む", "mac": "→", "desc": "フレーム単位で少しだけ進む", "hot": 3}, {"cat": "再生・ナビ", "name": "1コマ戻る", "mac": "←", "desc": "フレーム単位で少しだけ戻る", "hot": 3}, {"cat": "再生・ナビ", "name": "5コマ進む", "mac": "⇧→", "desc": "少し大きめに進む"}, {"cat": "再生・ナビ", "name": "5コマ戻る", "mac": "⇧←", "desc": "少し大きめに戻る"}, {"cat": "再生・ナビ", "name": "次の編集点へ", "mac": "↓", "desc": "クリップのつなぎ目に一気にジャンプ", "hot": 2}, {"cat": "再生・ナビ", "name": "前の編集点へ", "mac": "↑", "desc": "前のつなぎ目に一気にジャンプ", "hot": 2}, {"cat": "再生・ナビ", "name": "シーケンスの先頭へ", "mac": "Home", "desc": "いちばん最初に飛ぶ"}, {"cat": "再生・ナビ", "name": "シーケンスの最後へ", "mac": "End", "desc": "いちばん最後に飛ぶ"}, {"cat": "再生・ナビ", "name": "再生ヘッド上のクリップを選択", "mac": "⇧F", "desc": "いま見ているクリップをパッと選ぶ", "hot": 2, "gem": true}, {"cat": "再生・ナビ", "name": "イン〜アウトを再生", "mac": "⌥K", "desc": "決めた範囲だけ再生して確認", "hot": 1}, {"cat": "イン/アウト・トリム", "name": "イン点を打つ", "mac": "I", "desc": "使いたい範囲の「始まり」を決める", "hot": 3}, {"cat": "イン/アウト・トリム", "name": "アウト点を打つ", "mac": "O", "desc": "使いたい範囲の「終わり」を決める", "hot": 3}, {"cat": "イン/アウト・トリム", "name": "アウト点へ移動", "mac": "⇧O", "desc": "設定したアウト点にジャンプ"}, {"cat": "イン/アウト・トリム", "name": "イン点を解除", "mac": "⌥I", "desc": "イン点をリセット"}, {"cat": "イン/アウト・トリム", "name": "アウト点を解除", "mac": "⌥O", "desc": "アウト点をリセット"}, {"cat": "イン/アウト・トリム", "name": "イン/アウト両方解除", "mac": "⌘/", "desc": "範囲指定を全部リセット"}, {"cat": "イン/アウト・トリム", "name": "リフト（抜き取り）", "mac": ";", "desc": "範囲を消すが、すき間は残す"}, {"cat": "イン/アウト・トリム", "name": "抽出（エクストラクト）", "mac": "'", "desc": "範囲を消してすき間を詰める（イン/アウト版）", "hot": 2}, {"cat": "イン/アウト・トリム", "name": "全トラックをカット", "mac": "⇧S", "desc": "再生ヘッド位置で全レイヤーまとめて切る", "hot": 2, "gem": true}, {"cat": "イン/アウト・トリム", "name": "編集点を再生ヘッドまで伸ばす", "mac": "E", "desc": "選んだつなぎ目をヘッド位置まで一気にトリム", "hot": 2, "gem": true}, {"cat": "イン/アウト・トリム", "name": "次の編集点を再生ヘッドまで", "mac": "⇧W", "desc": "次のつなぎ目をヘッドまで伸ばす", "hot": 1}, {"cat": "イン/アウト・トリム", "name": "前の編集点を再生ヘッドまで", "mac": "⇧Q", "desc": "前のつなぎ目をヘッドまで伸ばす", "hot": 1}, {"cat": "イン/アウト・トリム", "name": "最寄り編集点を選択（リップルイン）", "mac": "W", "desc": "近くのつなぎ目をリップルトリム用に選ぶ", "hot": 1}, {"cat": "イン/アウト・トリム", "name": "最寄り編集点を選択（リップルアウト）", "mac": "Q", "desc": "近くのつなぎ目をリップルトリム用に選ぶ", "hot": 1}, {"cat": "イン/アウト・トリム", "name": "最寄り編集点を選択（ロール）", "mac": "Z", "desc": "近くのつなぎ目をロールトリム用に選ぶ", "hot": 1}, {"cat": "イン/アウト・トリム", "name": "トリムタイプ切替", "mac": "⇧E", "desc": "リップル/ロールなどトリムの種類を切り替え", "hot": 1}, {"cat": "イン/アウト・トリム", "name": "1コマ後ろへトリム", "mac": ".", "desc": "編集点を1フレーム後ろへ"}, {"cat": "イン/アウト・トリム", "name": "1コマ前へトリム", "mac": ",", "desc": "編集点を1フレーム前へ"}, {"cat": "イン/アウト・トリム", "name": "すき間を詰める", "mac": "⌥G", "desc": "シーケンス内のすき間をまとめて詰める", "hot": 1, "gem": true}, {"cat": "編集（クリップ）", "name": "インサート（挿入）", "mac": "K", "desc": "ソースを割り込ませて配置（後ろがずれる）", "hot": 3, "gem": true}, {"cat": "編集（クリップ）", "name": "オーバーレイ（上書き）", "mac": "L", "desc": "ソースを上書きで配置（後ろはずれない）", "hot": 3, "gem": true}, {"cat": "編集（クリップ）", "name": "グループ化", "mac": "⌘G", "desc": "複数クリップをまとめて動かせるように", "hot": 2}, {"cat": "編集（クリップ）", "name": "グループ解除", "mac": "⇧⌘G", "desc": "グループをばらす"}, {"cat": "編集（クリップ）", "name": "速度・デュレーション", "mac": "⌘R", "desc": "再生速度や長さを数値で変える", "hot": 2}, {"cat": "編集（クリップ）", "name": "フレームサイズに合わせる", "mac": "⌥F", "desc": "素材を画面サイズにピタッと合わせる", "hot": 2, "gem": true}, {"cat": "編集（クリップ）", "name": "フレーム保持を追加", "mac": "⌘.", "desc": "その位置の絵を静止画のように止める", "hot": 1, "gem": true}, {"cat": "編集（クリップ）", "name": "クリップを有効/無効", "mac": "B", "desc": "クリップを一時的に非表示（消さずに隠す）", "hot": 1}, {"cat": "編集（クリップ）", "name": "リンク / リンク解除", "mac": "⌘L", "desc": "映像と音声をくっつける/離す", "hot": 2}, {"cat": "編集（クリップ）", "name": "サブクリップを作成", "mac": "⌘U", "desc": "長い素材の一部を切り出して管理", "hot": 1}, {"cat": "編集（クリップ）", "name": "エフェクトを削除", "mac": "⌘⌫", "desc": "クリップに付けた効果を全部消す", "hot": 1}, {"cat": "タイムライン・トラック", "name": "シーケンス全体を表示", "mac": "\\", "desc": "タイムラインをズームして全体を一望", "hot": 2, "gem": true}, {"cat": "タイムライン・トラック", "name": "トラックを追加", "mac": "⌘;", "desc": "映像/音声のレーンを増やす"}, {"cat": "タイムライン・トラック", "name": "トラックを削除", "mac": "⌘-", "desc": "レーンを減らす"}, {"cat": "タイムライン・トラック", "name": "空きトラックを削除", "mac": "⌥⌘⌫", "desc": "空のレーンをまとめて片付け", "hot": 1}, {"cat": "タイムライン・トラック", "name": "全トラックを最小化", "mac": "-", "desc": "レーンを畳んで見やすく"}, {"cat": "タイムライン・トラック", "name": "全トラックを展開", "mac": "⌃⇧E", "desc": "レーンを広げて中身を見る"}, {"cat": "タイムライン・トラック", "name": "映像トラックをロック", "mac": "⇧R", "desc": "動かしたくない映像レーンを固定", "hot": 1}, {"cat": "タイムライン・トラック", "name": "音声トラックをロック", "mac": "⌥R", "desc": "動かしたくない音声レーンを固定", "hot": 1}, {"cat": "タイムライン・トラック", "name": "スナップ", "mac": "⇧⌘;", "desc": "クリップ同士をピタッとくっつける吸着ON/OFF", "hot": 2}, {"cat": "タイムライン・トラック", "name": "クリップを1コマ左へ", "mac": "⌘←", "desc": "選択クリップをフレーム単位で左に微調整", "hot": 1, "gem": true}, {"cat": "タイムライン・トラック", "name": "クリップを1コマ右へ", "mac": "⌘→", "desc": "選択クリップをフレーム単位で右に微調整", "hot": 1, "gem": true}, {"cat": "タイムライン・トラック", "name": "クリップを上のトラックへ", "mac": "⌥↑", "desc": "選択クリップを1つ上のレーンへ移動", "hot": 1}, {"cat": "タイムライン・トラック", "name": "クリップを下のトラックへ", "mac": "⌥↓", "desc": "選択クリップを1つ下のレーンへ移動", "hot": 1}, {"cat": "マーカー", "name": "色付きマーカー（緑）", "mac": "⌃M", "desc": "用途で色分けする目印", "hot": 1}, {"cat": "マーカー", "name": "色付きマーカー（赤）", "mac": "⇧M", "desc": "用途で色分けする目印", "hot": 1}, {"cat": "マーカー", "name": "マーカーを全消去", "mac": "⌥⌘M", "desc": "打った目印を全部消す", "hot": 1}, {"cat": "マーカー", "name": "次のマーカーへ", "mac": "⌘@", "desc": "次の目印にジャンプ"}, {"cat": "マーカー", "name": "前のマーカーへ", "mac": "⌘:", "desc": "前の目印にジャンプ"}, {"cat": "マルチカム", "name": "マルチカム カメラ1", "mac": "⌃1", "desc": "マルチカム編集でカメラ1に切替", "hot": 2, "gem": true}, {"cat": "マルチカム", "name": "マルチカム カメラ2", "mac": "⌃2", "desc": "マルチカム編集でカメラ2に切替", "hot": 2}, {"cat": "マルチカム", "name": "マルチカム カメラ3", "mac": "⌃3", "desc": "マルチカム編集でカメラ3に切替", "hot": 2}, {"cat": "マルチカム", "name": "マルチカム カメラ4", "mac": "⌃4", "desc": "マルチカム編集でカメラ4に切替", "hot": 2}, {"cat": "マルチカム", "name": "マルチカム カメラ5", "mac": "⌃5", "desc": "マルチカム編集でカメラ5に切替", "hot": 1}, {"cat": "マルチカム", "name": "マルチカム カメラ6", "mac": "⌃6", "desc": "マルチカム編集でカメラ6に切替", "hot": 1}, {"cat": "マルチカム", "name": "マルチカム カメラ7", "mac": "⌃7", "desc": "マルチカム編集でカメラ7に切替", "hot": 1}, {"cat": "マルチカム", "name": "マルチカム カメラ8", "mac": "⌃8", "desc": "マルチカム編集でカメラ8に切替", "hot": 1}, {"cat": "マルチカム", "name": "マルチカム カメラ9", "mac": "⌃9", "desc": "マルチカム編集でカメラ9に切替", "hot": 1}, {"cat": "オーディオ", "name": "音量を上げる", "mac": "⌃@", "desc": "選択クリップの音量を少し上げる", "hot": 1}, {"cat": "オーディオ", "name": "音量を下げる", "mac": "⌃:", "desc": "選択クリップの音量を少し下げる", "hot": 1}, {"cat": "オーディオ", "name": "音量を大きく上げる", "mac": "⌃[", "desc": "まとめて音量アップ"}, {"cat": "オーディオ", "name": "音量を大きく下げる", "mac": "⌃]", "desc": "まとめて音量ダウン"}, {"cat": "トランジション", "name": "標準の映像トランジション", "mac": "⌘D", "desc": "編集点にディゾルブ等を一発適用", "hot": 2, "gem": true}, {"cat": "トランジション", "name": "標準の音声トランジション", "mac": "⇧⌘D", "desc": "音のつなぎ目にフェードを一発適用", "hot": 1}, {"cat": "トランジション", "name": "標準トランジション（映像+音声）", "mac": "⇧D", "desc": "映像と音まとめてトランジション", "hot": 1}, {"cat": "エフェクト・カラー", "name": "エフェクトのON/OFF", "mac": "B", "desc": "かけた効果を一時的に切って見比べ", "hot": 1}, {"cat": "書き出し", "name": "書き出し（メディア）", "mac": "⌘M", "desc": "完成動画をファイルに出力", "hot": 3}, {"cat": "書き出し", "name": "キューに送る（AME）", "mac": "⌥⇧M", "desc": "Media Encoderで裏で書き出し。作業を止めない", "hot": 2, "gem": true}, {"cat": "書き出し", "name": "フレームを書き出し", "mac": "0", "desc": "いまの1枚を静止画で保存（サムネ用に便利）", "hot": 2, "gem": true}, {"cat": "パネル・画面", "name": "パネルを最大化 / 戻す", "mac": "@", "desc": "マウス下のパネルを全画面に。確認の定番", "hot": 2, "gem": true}, {"cat": "パネル・画面", "name": "選択パネルを最大化", "mac": "P", "desc": "いま選んでいるパネルを全画面に", "hot": 1}, {"cat": "パネル・画面", "name": "モニターを全画面", "mac": "⇧⌘F", "desc": "プレビューをフルスクリーン表示", "hot": 1}, {"cat": "パネル・画面", "name": "セーフエリア表示", "mac": "@", "desc": "テロップが切れない安全枠を表示", "hot": 1}];
+const TIPS = [{"cat": "書き出し", "hot": 3, "gem": true, "name": "YouTube用の書き出し設定", "badge": "保存版", "tag": "H.264で高画質&軽いファイルに", "kid": "書き出しは<b>形式=H.264</b>、プリセット「Match Source – Adaptive High Bitrate」でほぼOK。もっと軽く/高画質にしたい時だけ<b>ビットレートを手動</b>で微調整。", "code": "形式: H.264\nプリセット: Match Source – High bitrate\nビットレート: VBR 1パス / 目安 16Mbps前後(1080p)・40Mbps前後(4K)\n「最高レンダリング品質で使用」ON", "combo": ["縦型(リール/Shorts)は 1080×1920・同じくH.264で", "容量を抑えたい時は目標ビットレートを 8〜10Mbps に", "複数プリセットを一気に出すなら『キューに送る(⌥⇧M)』でAME一括"], "ai": "Premiere Proの書き出しについて質問です。【YouTube / Instagramリール】用に書き出したいのですが、【画質は良く・容量は軽く】したいです。形式・プリセット・ビットレートのおすすめを初心者向けに教えてください。素材は【1080p / 4K・尺◯分】です。"}, {"cat": "時短ワークフロー", "hot": 2, "gem": true, "name": "プロキシで重い4Kを軽く編集", "badge": "時短", "tag": "カクつく素材をサクサクに", "kid": "<b>プロキシ</b>＝編集用の軽い“代理”ファイル。作っておくと4Kでもプレビューがサクサク。書き出し時は自動で元の高画質に戻るので画質は落ちない。", "combo": ["プロジェクトパネルで素材を右クリック→プロキシ→プロキシを作成", "プログラムモニター下の ＋ からプロキシ切替ボタンを追加", "完成後の書き出しは自動でフル画質"]}, {"cat": "時短ワークフロー", "hot": 2, "gem": true, "name": "マルチカメラ編集", "badge": "定番", "tag": "複数カメラをリアルタイム切替", "kid": "複数カメラ/画面を音で同期して、<b>再生しながらキーで切替</b>できる。対談・セミナー編集が一気に速くなる。切替はこのプリセットだと <b>⌃1〜9</b>。", "combo": ["素材を複数選択→右クリック→マルチカメラソースシーケンスを作成(同期=オーディオ)", "プログラムモニターをマルチカメラ表示に", "再生しながら ⌃1〜9 でカメラ切替→あとで個別に微調整"]}, {"cat": "テロップ・グラフィック", "hot": 2, "gem": true, "name": "テロップのスタイルを登録して量産", "badge": "時短", "tag": "フォント設定を使い回す", "kid": "一度作ったテロップの見た目を<b>「スタイル」として登録</b>すると、次からワンクリックで同じデザインに。字幕量産が激速になる。", "combo": ["エッセンシャルグラフィックスでテキストを装飾", "「スタイル」→「スタイルを作成」で保存", "以降は他テロップに適用するだけ。全体の色替えも一括でできる"]}, {"cat": "テロップ・グラフィック", "hot": 2, "gem": true, "name": "自動文字起こしで字幕を作る", "badge": "AI", "tag": "話した言葉を自動でテロップに", "kid": "Premiereの<b>文字起こし</b>で音声を自動テキスト化→<b>キャプション</b>に変換→デザインを整えるだけ。字幕入れの手間が激減する。", "combo": ["テキストパネル→「文字起こし」を実行(言語=日本語)", "「キャプションを作成」→スタイルを適用", "キャプションは「グラフィックにアップグレード」で自由に装飾できる"], "ai": "Premiere Proの自動文字起こし・キャプション機能について質問です。【日本語の対談動画】の字幕を作りたいです。文字起こし→キャプション→デザインの手順と、うまく認識されない時の対処を初心者向けに教えてください。"}, {"cat": "音・BGM", "hot": 1, "gem": true, "name": "BGMを尺にピタッと合わせる（リミックス）", "badge": "AI", "tag": "曲を不自然にならず伸縮", "kid": "<b>リミックス</b>機能は、曲を不自然につながらないよう自動で編集して指定の長さに合わせてくれる。このプリセットだとリミックスツールは <b>⌃R</b>。", "combo": ["オーディオクリップ選択→エッセンシャルサウンド→「リミックス」", "目標の長さを指定するとAIが自然につなぎ直す", "手動なら ⌃R のリミックスツールでクリップ端をドラッグ"]}, {"cat": "カラー", "hot": 1, "name": "Lumetriカラーの基本手順", "badge": "基本", "tag": "色補正はこの順番で", "kid": "色補正は<b>①ホワイトバランス→②露出(明るさ)→③コントラスト→④彩度</b>の順が基本。最後にLook/LUTで雰囲気づけ。", "combo": ["調整レイヤー(このプリセット: ⌘T)に適用すると複数クリップまとめて色補正できる", "「基本補正」で整えてから「クリエイティブ」で雰囲気づけ", "やりすぎ防止に、適用ON/OFFで見比べる"]}, {"cat": "時短ワークフロー", "hot": 1, "name": "ジャンプカットをなめらかに（モーフカット）", "badge": "小技", "tag": "“えー・あのー”カットの違和感を消す", "kid": "不要な“間”を切ると人物がパッと飛ぶ→<b>モーフカット</b>を編集点に適用すると、AIが中間を補間して自然につないでくれる。", "combo": ["ビデオトランジション→「モーフカット」を編集点にドラッグ", "解析が終わるまで数秒待つ", "背景がシンプルなトーク動画ほどキレイに決まる"]}, {"cat": "メンテナンス", "hot": 1, "gem": true, "name": "このショートカット設定のバックアップ／移行", "badge": "保険", "tag": "PCを買い替えても引き継ぐ", "kid": "齋藤さんのキー設定は<b>.kysファイル</b>という1個のファイル。これをコピーして保管すれば、新しいPCでも読み込むだけで同じ環境に戻せる。", "code": "~/Documents/Adobe/Premiere Pro/<バージョン>/Profile-<ユーザー>/Mac/\n（現在の使用中プリセット: 250122_ショートカットキー.kys）", "combo": ["キーボードショートカット画面(このプリセット: ⌥⌘K)右上のアイコンで書き出し", "上のフォルダの .kys をクラウド/USBにコピーして保管", "新PCでは同じ画面から読み込むだけ"]}, {"cat": "書き出し", "hot": 1, "gem": true, "name": "サムネ用に1枚だけ静止画で出す", "badge": "小技", "tag": "今の画面をJPG/PNGで保存", "kid": "プログラムモニターの<b>カメラアイコン（フレームを書き出し / このプリセット: 0）</b>で、今表示している1コマを画像として保存できる。サムネ作りに便利。", "combo": ["出したい画面に再生ヘッドを置く", "0キー or カメラアイコン→形式JPEG/PNG→保存先を指定", "「プロジェクトに読み込む」にチェックすると素材としても使える"]}];
+
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+const FX = { staggerReveal(){}, pop(){}, fadeInUp(){}, countUp(){} };  // 演出は無し（自己完結・軽量）
+const APP_VERSION = 'v1.0';
+const APP_DATE = '2026-07-16';
+
+/* お気に入り（この端末のみに保存） */
+let favsInit = [];
+try { favsInit = JSON.parse(localStorage.getItem('prh-favs') || '[]'); } catch (e) {}
+const FAVS = new Set(favsInit);
+function toggleFav(key){ FAVS.has(key)?FAVS.delete(key):FAVS.add(key);
+  try{ localStorage.setItem('prh-favs', JSON.stringify([...FAVS])); }catch(e){} }
+const attr = s => s.replace(/"/g,'&quot;');
+const slugOf = n => n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+
+const state = { tab:'shortcuts', query:'', cat:'すべて', sort:'cat' };
+const $list = document.getElementById('list');
+const $chips = document.getElementById('chips');
+const $search = document.getElementById('search');
+const $tabs = document.getElementById('tabs');
+
+function cats(){
+  const src = state.tab==='shortcuts' ? SHORTCUTS : TIPS;
+  return ['すべて','💡','★', ...new Set(src.map(x=>x.cat))];
+}
+const CHIP_LABEL = { '★':'★ お気に入り', '💡':'💡 目から鱗' };
+function renderChips(){
+  if (state.tab==='quiz'){ $chips.innerHTML=''; return; }
+  $chips.innerHTML = cats().map(c =>
+    `<button data-cat="${c}" class="${c===state.cat?'on':''}">${CHIP_LABEL[c]||c}</button>`).join('');
+}
+
+/* Macのキー表記(⇧⌘S / F / ⌘← / Space 等)を kbd に。先頭の修飾キー記号を分解 */
+const MODS = '⌃⌥⇧⌘';
+function keyHtml(combo){
+  let i=0; const parts=[];
+  while(i<combo.length && MODS.includes(combo[i])){ parts.push(combo[i]); i++; }
+  const rest = combo.slice(i);
+  if (rest) parts.push(rest);
+  if (!parts.length) parts.push(combo);
+  return parts.map(k=>`<kbd>${k}</kbd>`).join('<span class="plus">+</span>');
+}
+function match(item, fields){
+  if (!state.query) return true;
+  const q = state.query.toLowerCase();
+  return fields.some(f => { const v=item[f];
+    return (Array.isArray(v)?v.join(' '):(v||'')).toLowerCase().includes(q); });
+}
+
+const hotOf = x => x.hot!=null ? x.hot : 2;
+const TIER_LABEL = { 3:'★★★ 超よく使う', 2:'★★ よく使う', 1:'★ 覚えておくと便利' };
+const sortByHot = items => items.slice().sort((a,b)=>hotOf(b)-hotOf(a));
+const CAT_ICON = {
+  'CAMP標準':'🏕','基本操作':'🧰','ファイル・プロジェクト':'📁','ツール':'🛠️','再生・ナビ':'▶️',
+  'イン/アウト・トリム':'✂️','編集（クリップ）':'🎬','タイムライン・トラック':'📊',
+  'マーカー':'📍','マルチカム':'🎥','ラベル・整理':'🏷️','オーディオ':'🔊',
+  'トランジション':'🌫️','エフェクト・カラー':'🎨','書き出し':'📤','パネル・画面':'🖥️',
+  '時短ワークフロー':'⚡','テロップ・グラフィック':'🔤','音・BGM':'🎵','カラー':'🎨','メンテナンス':'🧰',
+};
+const catLabel = c => `${CAT_ICON[c]||'■'} ${c}`;
+const catOrderOf = arr => { const m=new Map(); arr.forEach(x=>{ if(!m.has(x.cat)) m.set(x.cat,m.size); }); return m; };
+const SC_CAT_ORDER = catOrderOf(SHORTCUTS);
+const TIP_CAT_ORDER = catOrderOf(TIPS);
+function arrange(items, order){
+  return state.sort==='hot' ? sortByHot(items)
+    : items.slice().sort((a,b)=>(order.get(a.cat)-order.get(b.cat))||(hotOf(b)-hotOf(a)));
+}
+function headOf(item, byTier, counts){
+  if (byTier && state.sort==='hot') return { key:TIER_LABEL[hotOf(item)], html:`<div class="cat-head tier">${TIER_LABEL[hotOf(item)]}</div>` };
+  return { key:item.cat, html:`<div class="cat-head">${catLabel(item.cat)}<span class="count">(${counts.get(item.cat)})</span></div>` };
+}
+const countByCat = items => items.reduce((m,x)=>m.set(x.cat,(m.get(x.cat)||0)+1), new Map());
+const hotStars = x => hotOf(x)===3 ? ' <span class="hot-stars">★★★</span>' : '';
+
+function renderShortcuts(){
+  const favView = state.cat==='★', gemView = state.cat==='💡';
+  const byTier = state.cat==='すべて' || favView || gemView;
+  const items = arrange(SHORTCUTS.filter(s =>
+    (favView ? FAVS.has('s:'+s.name) : gemView ? s.gem : (byTier || s.cat===state.cat)) &&
+    match(s, ['name','desc','mac','cat'])), SC_CAT_ORDER);
+  if (!items.length){ $list.innerHTML = `<div class="empty">${favView&&!state.query?'各項目の ★ を押すと、ここに自分専用の早見帳が作れます':'見つかりませんでした 🔍'}</div>`; return; }
+  const counts = countByCat(items); let html='', lastHead='';
+  for (const s of items){
+    const head = headOf(s, byTier, counts);
+    if (head.key!==lastHead){ html+=head.html; lastHead=head.key; }
+    html += `
+      <div class="card sc-card">
+        <div class="sc-row">
+          <div>
+            <div class="sc-name">${s.name}${hotStars(s)}${s.gem?' <span class="gem-badge">💡目から鱗</span>':''}${byTier&&state.sort==='hot'?` <span class="mini-cat">${s.cat}</span>`:''}</div>
+            <div class="sc-desc">${s.desc}</div>
+          </div>
+          <div class="sc-keys">${keyHtml(s.mac)}</div>
+          <button class="fav-btn ${FAVS.has('s:'+s.name)?'on':''}" data-key="s:${attr(s.name)}" aria-label="お気に入り">★</button>
+        </div>
+      </div>`;
+  }
+  $list.innerHTML = html;
+}
+
+function renderTips(){
+  const favView = state.cat==='★', gemView = state.cat==='💡';
+  const byTier = state.cat==='すべて' || favView || gemView;
+  const items = arrange(TIPS.filter(e =>
+    (favView ? FAVS.has('t:'+e.name) : gemView ? e.gem : (byTier || e.cat===state.cat)) &&
+    match(e, ['name','tag','kid','cat','combo','code'])), TIP_CAT_ORDER);
+  if (!items.length){ $list.innerHTML = `<div class="empty">${favView&&!state.query?'各項目の ★ を押すと、ここに自分専用の便利ワザ集が作れます':'見つかりませんでした 🔍'}</div>`; return; }
+  const counts = countByCat(items); let html='', lastHead='';
+  items.forEach(e => {
+    const i = TIPS.indexOf(e);
+    const head = headOf(e, byTier, counts);
+    if (head.key!==lastHead){ html+=head.html; lastHead=head.key; }
+    html += `
+      <div class="card ex-card" data-i="${i}" id="${slugOf(e.name)}">
+        <div class="ex-head">
+          <div class="ex-title">
+            <span class="ex-name">${e.name}${hotStars(e)}</span>
+            ${e.badge?`<span class="ex-badge">${e.badge}</span>`:''}${e.gem?'<span class="gem-badge">💡目から鱗</span>':''}
+            <button class="fav-btn ${FAVS.has('t:'+e.name)?'on':''}" data-key="t:${attr(e.name)}" aria-label="お気に入り" style="margin-left:auto">★</button>
+            <span class="ex-caret" style="margin-left:0">▶</span>
+          </div>
+          <div class="ex-tag">${e.tag}</div>
+        </div>
+        <div class="ex-body">
+          ${e.code?`<div class="ex-code">${e.code}<button class="link-btn" data-slug="${slugOf(e.name)}">🔗</button><button class="copy-btn">コピー</button></div>`:''}
+          <div class="ex-kid">${e.kid}</div>
+          ${e.combo?`<div class="ex-combo"><div class="combo-t">🧩 手順・コツ</div><ul>${e.combo.map(c=>`<li>${c}</li>`).join('')}</ul></div>`:''}
+          ${e.ai?`<div class="ex-ai"><div class="ai-t">🤖 うまくいかない時は、AIにこう聞こう</div><div class="ai-text">${e.ai}</div><button class="ai-copy">質問文をコピーする（【 】を書き換えて送信）</button></div>`:''}
+        </div>
+      </div>`;
+  });
+  $list.innerHTML = html;
+}
+
+function render(){
+  renderChips();
+  const isQuiz = state.tab==='quiz';
+  document.querySelector('.searchbar').style.display = isQuiz?'none':'';
+  document.getElementById('sortbar').style.display = isQuiz?'none':'';
+  if (isQuiz) renderQuiz();
+  else (state.tab==='shortcuts' ? renderShortcuts : renderTips)();
+}
+
+/* ===== クイズ ===== */
+let quiz = null;
+const shuffle = arr => arr.slice().sort(()=>Math.random()-0.5);
+function buildQuiz(mode){
+  const scQ = s => {
+    const pool = shuffle([...new Set(SHORTCUTS.map(x=>x.mac))].filter(k=>k!==s.mac)).slice(0,3);
+    return { text:`「${s.name}」のショートカットは？`, hint:s.desc, answer:s.mac, choices:shuffle([s.mac,...pool]), isKey:true };
+  };
+  const tipQ = x => {
+    const pool = shuffle(TIPS.filter(y=>y!==x)).slice(0,3).map(y=>y.name);
+    return { text:`「${x.tag}」— どの便利ワザ？`, hint:'', answer:x.name, choices:shuffle([x.name,...pool]), isKey:false };
+  };
+  const qs = mode==='sc' ? shuffle(SHORTCUTS).slice(0,10).map(scQ)
+    : mode==='tip' ? shuffle(TIPS).slice(0,Math.min(10,TIPS.length)).map(tipQ)
+    : shuffle([...shuffle(SHORTCUTS).slice(0,7).map(scQ), ...shuffle(TIPS).slice(0,3).map(tipQ)]);
+  quiz = { mode, qs, i:0, score:0, answered:false };
+}
+function renderQuiz(){
+  if (!quiz){
+    $list.innerHTML = `
+      <div class="card" style="padding:16px 14px">
+        <div class="quiz-hero">🎯 クイズで覚える</div>
+        <p class="quiz-lead">ランダム出題。くり返すほど手が覚えます。<br>ショートカットは齋藤さんの<b>Premiere実キー</b>で出題されます。</p>
+        <button class="quiz-mode-btn" data-mode="sc">⌨️ ショートカット 10問</button>
+        <button class="quiz-mode-btn" data-mode="tip">💡 便利ワザ ${Math.min(10,TIPS.length)}問</button>
+        <button class="quiz-mode-btn" data-mode="mix">🔀 ミックス 10問</button>
+      </div>`;
+    return;
+  }
+  if (quiz.i >= quiz.qs.length){
+    const s=quiz.score, n=quiz.qs.length;
+    const msg = s>=Math.ceil(n*0.9)?'満点級！手が完全に覚えてます 🏆':s>=Math.ceil(n*0.7)?'すごい！あと少しで満点 🔥':s>=Math.ceil(n*0.4)?'いい感じ！もう一周で定着 💪':'まずは「★★★ 超よく使う」から覚えよう 📖';
+    $list.innerHTML = `
+      <div class="card quiz-result">
+        <div class="quiz-prog">RESULT</div>
+        <div class="quiz-score"><span class="q-score">${s}</span> / ${n}</div>
+        <div class="quiz-msg">${msg}</div>
+        <button class="quiz-next" data-act="retry">🔁 もう一度（同じモード）</button>
+        <button class="quiz-mode-btn" data-act="menu">モード選択にもどる</button>
+      </div>`;
+    return;
+  }
+  const q = quiz.qs[quiz.i];
+  $list.innerHTML = `
+    <div class="card quiz-wrap" style="padding:14px">
+      <div class="quiz-prog">Q${quiz.i+1} / ${quiz.qs.length}　スコア ${quiz.score}</div>
+      <div class="quiz-q">${q.text}</div>
+      ${q.hint?`<div class="quiz-hint">ヒント: ${q.hint}</div>`:''}
+      ${q.choices.map((c,ci)=>`<div class="quiz-choice" data-ci="${ci}">${q.isKey?keyHtml(c):c}</div>`).join('')}
+      <div class="quiz-foot"></div>
+    </div>`;
+}
+function answerQuiz(ci){
+  const q = quiz.qs[quiz.i]; quiz.answered=true;
+  const correct = q.choices[ci]===q.answer; if (correct) quiz.score++;
+  document.querySelectorAll('.quiz-choice').forEach((el,idx)=>{
+    if (q.choices[idx]===q.answer) el.classList.add('ok'); else if (idx===ci) el.classList.add('ng');
+  });
+  document.querySelector('.quiz-prog').textContent = `Q${quiz.i+1} / ${quiz.qs.length}　スコア ${quiz.score}`;
+  const last = quiz.i===quiz.qs.length-1;
+  document.querySelector('.quiz-foot').innerHTML = `<button class="quiz-next" data-act="next">${last?'結果を見る':'次の問題 →'}</button>`;
+}
+
+/* ===== イベント ===== */
+$tabs.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-tab]');
+  if (!btn || btn.dataset.tab===state.tab) return;
+  state.tab = btn.dataset.tab; state.cat='すべて';
+  if (state.tab==='quiz') quiz=null;
+  $tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b===btn));
+  render();
+});
+$chips.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-cat]'); if (!btn) return;
+  state.cat = btn.dataset.cat; render();
+});
+document.getElementById('sortbar').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-sort]'); if (!btn || btn.dataset.sort===state.sort) return;
+  state.sort = btn.dataset.sort;
+  document.querySelectorAll('#sortbar button').forEach(b=>b.classList.toggle('on', b===btn));
+  render();
+});
+let searchTimer;
+$search.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(()=>{ state.query=$search.value.trim(); render(); }, 160);
+});
+function copyText(text){
+  return (navigator.clipboard?navigator.clipboard.writeText(text):Promise.reject()).catch(()=>{
+    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  });
+}
+$list.addEventListener('click', e => {
+  const favBtn = e.target.closest('.fav-btn');
+  if (favBtn){ e.stopPropagation(); toggleFav(favBtn.dataset.key);
+    favBtn.classList.toggle('on', FAVS.has(favBtn.dataset.key));
+    if (state.cat==='★') render(); return; }
+  const modeBtn = e.target.closest('.quiz-mode-btn');
+  if (modeBtn){ if (modeBtn.dataset.mode) buildQuiz(modeBtn.dataset.mode); else quiz=null; renderQuiz(); return; }
+  const choice = e.target.closest('.quiz-choice');
+  if (choice && quiz && !quiz.answered){ answerQuiz(Number(choice.dataset.ci)); return; }
+  const nextBtn = e.target.closest('.quiz-next');
+  if (nextBtn){ if (nextBtn.dataset.act==='retry') buildQuiz(quiz.mode); else { quiz.i++; quiz.answered=false; } renderQuiz(); return; }
+  const linkBtn = e.target.closest('.link-btn');
+  if (linkBtn){ e.stopPropagation();
+    copyText(location.href.split('#')[0]+'#'+linkBtn.dataset.slug).finally(()=>{
+      linkBtn.textContent='✓'; linkBtn.classList.add('done');
+      setTimeout(()=>{ linkBtn.textContent='🔗'; linkBtn.classList.remove('done'); },1400); });
+    return; }
+  const copyBtn = e.target.closest('.copy-btn');
+  if (copyBtn){ e.stopPropagation();
+    const box = copyBtn.parentElement.cloneNode(true);
+    box.querySelectorAll('button').forEach(b=>b.remove());
+    copyText(box.textContent.trim()).finally(()=>{
+      copyBtn.textContent='✓ OK!'; copyBtn.classList.add('done');
+      setTimeout(()=>{ copyBtn.textContent='コピー'; copyBtn.classList.remove('done'); },1400); });
+    return; }
+  const aiBtn = e.target.closest('.ai-copy');
+  if (aiBtn){ e.stopPropagation();
+    copyText(aiBtn.parentElement.querySelector('.ai-text').textContent.trim()).finally(()=>{
+      aiBtn.textContent='✓ コピーしました！AIチャットに貼って【 】を書き換えてください'; aiBtn.classList.add('done');
+      setTimeout(()=>{ aiBtn.textContent='質問文をコピーする（【 】を書き換えて送信）'; aiBtn.classList.remove('done'); },2200); });
+    return; }
+  const head = e.target.closest('.ex-head');
+  if (head){ head.parentElement.classList.toggle('open'); }
+});
+
+/* カード直リンク: #slug で該当便利ワザを開く */
+function openFromHash(){
+  const slug = decodeURIComponent(location.hash.slice(1)); if (!slug) return;
+  const i = TIPS.findIndex(x=>slugOf(x.name)===slug); if (i<0) return;
+  if (state.tab!=='tips'){ state.tab='tips'; state.cat='すべて';
+    $tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.tab==='tips')); render(); }
+  const card = document.querySelector(`.ex-card[data-i="${i}"]`);
+  if (card && !card.classList.contains('open')){ card.classList.add('open');
+    setTimeout(()=>card.scrollIntoView({block:'start',behavior:'smooth'}),80); }
+}
+
+/* 初期化 */
+document.querySelector('footer').textContent = `PR早見帳 ${APP_VERSION} (${APP_DATE}) — ホーム画面に追加するとアプリのように使えます`;
+render();
+openFromHash();
+window.addEventListener('hashchange', openFromHash);
+
+</script>
+</body>
+</html>
