@@ -1,5 +1,5 @@
 /* PR早見帳 Service Worker — オフライン動作用。更新したら CACHE 名を上げる */
-const CACHE = 'pr-hayamicho-v1';
+const CACHE = 'pr-hayamicho-v2';
 const ASSETS = [
   './',
   './index.html',
